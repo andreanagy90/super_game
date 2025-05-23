@@ -183,9 +183,3 @@ class Level:
         self.other_tiles.draw(self.display_surface)
         self.player.draw(self.display_surface)
 
-
-
-        
-
-
-    
