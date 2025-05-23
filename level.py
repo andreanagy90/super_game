@@ -17,7 +17,7 @@ class Level:
         self.quit_rect = pygame.Rect(0,0,0,0)
         self.worldshift_x = 0
         self.worldshift_y = 0
-        self.looking = False
+
    
 
     def menu_window(self):
@@ -105,28 +105,15 @@ class Level:
         camera_y = screen_height - 150
                 
 
-
-        if player_y < screen_height / 5 :
-            self.worldshift_y = 8
-
-            
-            
-        elif player_y > camera_y - 64 and direction_y > 0:
-            self.worldshift_y = -16
-
-            
-        else:
-            self.worldshift_y = 0
-
-    def looking_on_map(self):
-        player = self.player.sprite
-
-
-
         if player.looking_mode and player.rect.y >= screen_height / 3:
-           target_shift = -16
+            target_shift = -16
+        elif player_y < screen_height / 5:
+            target_shift = 8
+        elif player_y > camera_y - 64 and direction_y > 0:
+            target_shift = -16
         else:
             target_shift = 0
+
 
 
         if self.worldshift_y < target_shift:
@@ -138,7 +125,14 @@ class Level:
             if self.worldshift_y < target_shift:
                 self.worldshift_y = target_shift
 
-        self.worldshift_y = int(self.worldshift_y)
+        else:
+            self.worldshift_y = target_shift
+            player.looking_mode = False
+
+
+
+
+                
 
 
             
@@ -180,10 +174,7 @@ class Level:
         self.player.update()
         self.move_player()
         self.scroll_x()
-        if self.player.sprite.looking_mode:
-            self.looking_on_map()
-        else:
-            self.scroll_y()
+        self.scroll_y()
         self.vertical_collision()
         self.horizontal_collision()
         self.terrain_tiles.update(self.worldshift_x, self.worldshift_y)
