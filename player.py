@@ -22,7 +22,7 @@ class Player(pygame.sprite.Sprite):
         self.status = "idle"
         self.facing_forward = True
         self.animation_speed = 0.15
-        self.looking_mode = True
+        self.looking_mode = False
 
     def import_character(self):
         char_path = os.path.join(base_path, "img", "char")
@@ -67,16 +67,16 @@ class Player(pygame.sprite.Sprite):
             self.status = "walk"
             self.direction.x = 1
             self.facing_forward = True
-            self.looking_mode = False
+
 
         elif keys[pygame.K_LEFT]:
             self.direction.x = -1
             self.facing_forward = False  
             self.status = "walk"  
+
         else:
             self.direction.x = 0
             self.status = "idle"
-            self.looking_mode = True
 
         if keys[pygame.K_SPACE] and self.on_ground:
             self.on_ground = False
@@ -93,9 +93,6 @@ class Player(pygame.sprite.Sprite):
             
         if keys[pygame.K_DOWN] and self.status == "idle":
             self.looking_mode = True
-        else:
-            self.looking_mode = False
-
 
 
                 
