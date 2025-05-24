@@ -18,7 +18,7 @@ clock = pygame.time.Clock()
 bg = os.path.join(base_path,"img","BG.png")
 bg_surf = pygame.image.load(bg).convert_alpha()
 bg_rect = bg_surf.get_rect(bottomleft=(0, screen_height))
-bg_resize = pygame.transform.smoothscale(bg_surf, (screen_width*1.5, screen_height*1.5))
+bg_resize = pygame.transform.smoothscale(bg_surf, (screen_width*1.2, screen_height*1.2))
 
 bg_02 = os.path.join(base_path,"img","BG_2.png")
 bg_02_surf = pygame.image.load(bg_02).convert_alpha()

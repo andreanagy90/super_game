@@ -1,5 +1,5 @@
 import pygame
-from settings import tile_size, screen_height, screen_width, others, platforms, font_import, level_map, start_y
+from settings import tile_size, screen_height, screen_width, others, platforms, font_import, level_map, start_y, world_height
 from states import start_state, game_over, run_state
 from tiles import TerrainTile, OtherTiles
 from player import Player
@@ -17,6 +17,13 @@ class Level:
         self.quit_rect = pygame.Rect(0,0,0,0)
         self.worldshift_x = 0
         self.worldshift_y = 0
+        self.look_down_offset = 0
+        self.camera_offset = 0
+        self.max_look = 80
+        self.prev_camera_offset = 0
+
+
+
 
    
 
@@ -100,40 +107,48 @@ class Level:
 
     def scroll_y(self):
         player = self.player.sprite
-        player_y = player.rect.y
+        player_y = player.rect.centery
         direction_y = player.direction.y
-        camera_y = screen_height - 150
-                
-
-        if player.looking_mode and player.rect.y >= screen_height / 3:
-            target_shift = -16
-        elif player_y < screen_height / 5:
-            target_shift = 8
-        elif player_y > camera_y - 64 and direction_y > 0:
-            target_shift = -16
-        else:
-            target_shift = 0
+        camera_y = (screen_height - 130) + self.camera_offset
+        #target_y = (screen_height - 130)
 
 
+        if direction_y < 0 and player_y < (screen_height / 5):
+            self.worldshift_y = (screen_height / 5 )- player_y
+            player.rect.centery = screen_height / 5
 
-        if self.worldshift_y < target_shift:
-            self.worldshift_y += 1
-            if self.worldshift_y > target_shift:
-                self.worldshift_y = target_shift
-        elif self.worldshift_y > target_shift:
-            self.worldshift_y -= 1
-            if self.worldshift_y < target_shift:
-                self.worldshift_y = target_shift
+        elif direction_y > 0 and player_y > camera_y:
+            self.worldshift_y = camera_y - player_y
+            player.rect.centery = camera_y
 
         else:
-            self.worldshift_y = target_shift
-            player.looking_mode = False
+            if self.camera_offset > 0:
+                self.worldshift_y = 0
+            else:
+                self.worldshift_y = 0
+
+        self.worldshift_y = self.prev_camera_offset - self.camera_offset
+
+
+
+    def looking_mode(self):
+        keys = pygame.key.get_pressed()
+        player = self.player.sprite
+
+
+        if keys[pygame.K_DOWN]:
+            self.camera_offset += 8
+            self.camera_offset = min(self.camera_offset, self.max_look) 
+        else:
+            self.camera_offset -= 8
+            self.camera_offset = max(self.camera_offset, 0)
+
+        self.camera_offset = max(0, min(self.camera_offset, self.max_look))
 
 
 
 
-                
-
+            
 
             
 
@@ -163,10 +178,10 @@ class Level:
         player = self.player.sprite
         for sprite in self.terrain_tiles.sprites():
             if sprite.rect.colliderect(player.rect):
-                    if player.direction.x > 0 :
-                        player.rect.right = sprite.rect.left
                     if player.direction.x < 0 :
-                         player.rect.left = sprite.rect.right
+                        player.rect.left = sprite.rect.right
+                    if player.direction.x > 0 :
+                         player.rect.right = sprite.rect.left
                 
 
 
@@ -174,6 +189,7 @@ class Level:
         self.player.update()
         self.move_player()
         self.scroll_x()
+        #self.looking_mode()
         self.scroll_y()
         self.vertical_collision()
         self.horizontal_collision()
@@ -183,3 +199,9 @@ class Level:
         self.other_tiles.draw(self.display_surface)
         self.player.draw(self.display_surface)
 
+
+
+        
+
+
+    
