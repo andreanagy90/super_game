@@ -1,15 +1,17 @@
 import pygame
-from settings import tile_size, screen_height, screen_width, others, platforms, font_import, level_map, start_y, world_height
+from settings import tile_size, screen_height, screen_width, others, platforms, font_import, level_map, start_y, world_height, world_width
 from states import start_state, game_over, run_state
-from tiles import TerrainTile, OtherTiles
+from tiles import TerrainTile, OtherTiles, Tile
 from player import Player
 import sys
 
 class Level:
+    global start_state, game_over, run_state
     def __init__(self, level_data, surface):
         self.display_surface = surface
         self.terrain_tiles = pygame.sprite.Group()
         self.other_tiles = pygame.sprite.Group()
+        self.const = pygame.sprite.Group()
         self.hovered_button = None
         self.state = start_state
         self.player = pygame.sprite.GroupSingle()
@@ -82,6 +84,11 @@ class Level:
                     player_sprite = Player((x,y_on_screen))
                     self.player.add(player_sprite)
 
+                elif tile_type == "C":
+                    const =  Tile(tile_size, x, y_on_screen)
+                    self.const.add(const)
+
+
                 #elif tile_type != " ":
                 elif tile_type in platforms:
                     tile = TerrainTile(tile_size,x,y_on_screen,tile_type)
@@ -120,14 +127,9 @@ class Level:
         elif direction_y > 0 and player_y > camera_y:
             self.worldshift_y = camera_y - player_y
             player.rect.centery = camera_y
-
+        
         else:
-            if self.camera_offset > 0:
-                self.worldshift_y = 0
-            else:
-                self.worldshift_y = 0
-
-        self.worldshift_y = self.prev_camera_offset - self.camera_offset
+            self.worldshift_y = 0
 
 
 
@@ -182,7 +184,21 @@ class Level:
                         player.rect.left = sprite.rect.right
                     if player.direction.x > 0 :
                          player.rect.right = sprite.rect.left
-                
+
+    # def collision_aqua(self):
+    #     player = self.player.sprite
+    #     aquas = ["q", "s"]
+    #     global run_state, start_state, game_over
+    #     for tile in self.terrain_tiles.sprites():
+    #         if tile.rect.colliderect(player.rect):
+    #             if tile.type in aquas:
+    #                 player.speed = max(player.speed -1, 1)
+    #                 start_state = True
+    #                 run_state = False
+    #                 game_over = False
+    #                 self.state = start_state
+
+
 
 
     def run(self):
@@ -193,6 +209,7 @@ class Level:
         self.scroll_y()
         self.vertical_collision()
         self.horizontal_collision()
+        #self.collision_aqua()
         self.terrain_tiles.update(self.worldshift_x, self.worldshift_y)
         self.terrain_tiles.draw(self.display_surface)
         self.other_tiles.update(self.worldshift_x, self.worldshift_y)
